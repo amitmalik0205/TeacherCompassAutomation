@@ -17,5 +17,7 @@ public class TcAutomationUtil {
 		
 	}
 	
-	
+	public static int getIntFormString(String string) {
+		return new Integer(string);
+	}
 }

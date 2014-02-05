@@ -42,7 +42,7 @@ public class StudentLearningObjectivesPage extends BasePage {
 		waitForPageLoad(getPropertyValue("observation.form.page.title1"));
 		
 		List<WebElement> list = studentLearningObjectivesUi.getSloTableRowsList();
-		Assert.assertNotNull(list, "liast is null");
+		Assert.assertNotNull(list, "list is null");
 
 		return new ClassRoomObservationFormPage(driver, capabilities, executor,
 				propertReaderUtil);

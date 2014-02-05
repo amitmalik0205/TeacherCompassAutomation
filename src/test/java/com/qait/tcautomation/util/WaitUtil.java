@@ -201,7 +201,7 @@ public class WaitUtil {
 	
 	
 	public static boolean waitForJavaScriptCondition(WebDriver driver,
-			final String javaScript, int timeOutInSeconds) {
+			final String javaScript, int timeOutInSeconds, final Object...arg) {
 		boolean jscondition = false;
 		try {
 			driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS); // nullify
@@ -212,7 +212,7 @@ public class WaitUtil {
 				@Override
 				public Boolean apply(WebDriver driverObject) {
 					return (Boolean) ((JavascriptExecutor) driverObject)
-							.executeScript(javaScript);
+							.executeScript(javaScript, arg);
 				}
 			});
 			jscondition = (Boolean) ((JavascriptExecutor) driver)

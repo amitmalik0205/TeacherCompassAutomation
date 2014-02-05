@@ -3,12 +3,17 @@ package com.qait.tcautomation.ui;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 import com.qait.tcautomation.util.WaitUtil;
 
+/**
+ * @author amitmalik
+ * 
+ */
 public class ClassRoomObservationFormPageUi extends BaseUi {
 
 	/*
@@ -18,9 +23,49 @@ public class ClassRoomObservationFormPageUi extends BaseUi {
 	@FindBy(xpath = "//div[@id='leftpanelnew']/ul/li")
 	private List<WebElement> liElementList;
 
-	//text area for overall comments
+	// text area for overall comments
 	@FindBy(id = "overallComments")
 	private WebElement overallCommentTextArea;
+
+	// text area for note pad comments
+	@FindBy(id = "commenttext")
+	private WebElement notepadCommentTextArea;
+
+	// Add artifacts button
+	@FindBy(css = "a[class='btn btn-small addArtifactLink']")
+	private WebElement artifactButton;
+
+	// email of the recipient in share draft model
+	@FindBy(id = "associatedUser")
+	private WebElement shareDraftEmailTxtBox;
+
+	// email body in share draft model
+	@FindBy(id = "sendDraftMessage")
+	private WebElement shareDraftMsgTxtBox;
+
+	// Button to launch share draft pop up
+	@FindBy(id = "sendDraft")
+	private WebElement shareDraftButton;
+
+	// Button to share(send) draft on the pop up
+	@FindBy(id = "sendEvaluationDraft")
+	private WebElement sendDraftButton;
+
+	@FindBy(css = "button[id='btnText']")
+	private WebElement chooseFileTypeButton;
+
+	/**
+	 * Share button for principal
+	 */
+	@FindBy(linkText = "Share")
+	private WebElement principalShareButton;
+
+	/**
+	 * This button appears on the modal pop up when principal click on
+	 * 'principalShareButton' button
+	 */
+	@FindBy(id = "sendResponseInModal")
+	private WebElement finalPrincipalShareButton;
 
 	public ClassRoomObservationFormPageUi(WebDriver driver) {
 		super(driver);
@@ -32,6 +77,42 @@ public class ClassRoomObservationFormPageUi extends BaseUi {
 
 	public WebElement getOverallCommentTextArea() {
 		return overallCommentTextArea;
+	}
+
+	public WebElement getNotepadCommentTextArea() {
+		return notepadCommentTextArea;
+	}
+
+	public WebElement getArtifactButton() {
+		return artifactButton;
+	}
+
+	public WebElement getShareDraftEmailTxtBox() {
+		return shareDraftEmailTxtBox;
+	}
+
+	public WebElement getShareDraftMsgTxtBox() {
+		return shareDraftMsgTxtBox;
+	}
+
+	public WebElement getShareDraftButton() {
+		return shareDraftButton;
+	}
+
+	public WebElement getSendDraftButton() {
+		return sendDraftButton;
+	}
+
+	public WebElement getChooseFileTypeButton() {
+		return chooseFileTypeButton;
+	}
+
+	public WebElement getPrincipalShareButton() {
+		return principalShareButton;
+	}
+
+	public WebElement getFinalPrincipalShareButton() {
+		return finalPrincipalShareButton;
 	}
 
 	/**
@@ -78,7 +159,7 @@ public class ClassRoomObservationFormPageUi extends BaseUi {
 
 		return listOfCommentTextArea;
 	}
-	
+
 	/**
 	 * Method returns the <div> element (which contains the status of the
 	 * comments) of Domains from left panel
@@ -91,8 +172,111 @@ public class ClassRoomObservationFormPageUi extends BaseUi {
 		return driver.findElement(By.xpath("//div[@id='leftpanelnew']/ul/li["
 				+ pos + "]/a/div"));
 	}
-	
+
+	/**
+	 * Click on the save button
+	 */
 	public void clickSaveButton() {
 		clickAnchorWithLinkText("Save");
+	}
+
+	/**
+	 * Click on <a> element with 'Notepad' as link text
+	 */
+	public void clickNotePadButton() {
+		clickAnchorWithLinkText("Notepad");
+	}
+
+	/**
+	 * Click on 'Link to standards' button
+	 */
+	public void clickLinkToStandardsButton() {
+		clickAnchorWithLinkText("Link to standards");
+	}
+
+	/**
+	 * Wait for all check box elements in the pop up (appears after clicking
+	 * 'link to standards' button) and returns their list
+	 * 
+	 * @return List<WebElement>
+	 */
+	public List<WebElement> getStandardLinkCheckboxList() {
+
+		List<WebElement> popUpTable = WaitUtil
+				.waitForAllElementsPresence(
+						driver,
+						By.xpath("//div[@id='viewShareData']/div[2]/div/div/table/tbody/tr/td[2]/input"),
+						WaitUtil.DEFAULT_WAIT_FOR_ELEMENT);
+
+		return popUpTable;
+	}
+
+	/**
+	 * Method to click on the save button of the pop up (appears after clicking
+	 * 'link to standards' button)
+	 */
+	public void clickSaveButtonOfPopUp() {
+
+		WebElement element = WaitUtil.waitForElementPresence(driver,
+				By.xpath("//div[@id='viewShareData']/div[3]/a[1]"),
+				WaitUtil.DEFAULT_WAIT_FOR_ELEMENT);
+
+		element.click();
+	}
+
+	/**
+	 * This method will wait until message 'Your changes have been saved
+	 * successfully' is shown in
+	 * <p>
+	 * and returns it
+	 */
+	public WebElement waitForParagraphMessageToAppear() {
+		WebElement e = WaitUtil
+				.waitForElementVisiblity(
+						driver,
+						By.xpath("//p[contains(@class, 'alert') and contains(@class, 'alert-success')]"),
+						WaitUtil.DEFAULT_WAIT_FOR_PAGE);
+
+		return e;
+	}
+
+	/**
+	 * This method will wait until message 'Draft sent successfully' or 'Your
+	 * changes have been saved successfully' is shown in <div> and returns it
+	 */
+	public WebElement waitForDivMessageToAppear() {
+		WebElement e = WaitUtil
+				.waitForElementVisiblity(
+						driver,
+						By.xpath("//div[contains(@class, 'alert') and contains(@class, 'alert-success')]"),
+						WaitUtil.DEFAULT_WAIT_FOR_ELEMENT);
+
+		return e;
+	}
+
+	public void clickDocumentArtifactTypeButton() {
+		// ((JavascriptExecutor) driver).executeScript("checkFileType(11);");
+		driver.findElement(
+				By.cssSelector("ul[class='dropdown-menu']>li:nth-child(1)>a"))
+				.click();
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		WebElement e = driver.findElement(By.id("kaltura-uploader"));
+		e.click();
+		System.out.println();
+
+		((JavascriptExecutor) driver)
+				.executeScript("var o = swfobject.getObjectById('kaltura-uploader'); alert(o);");
+		System.out.println();
+		/*
+		 * WaitUtil.waitForElementPresence(driver,
+		 * By.cssSelector("div[id='kaltura-upload-form'] [class='']"),
+		 * WaitUtil.DEFAULT_WAIT_FOR_ELEMENT); System.out.println();
+		 */
 	}
 }

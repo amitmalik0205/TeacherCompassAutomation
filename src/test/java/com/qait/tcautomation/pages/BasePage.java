@@ -1,11 +1,17 @@
 package com.qait.tcautomation.pages;
 
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
@@ -13,7 +19,6 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.safari.SafariDriver;
-import org.testng.Assert;
 import org.testng.Reporter;
 
 import com.qait.tcautomation.ui.ClassRoomObservationFormPageUi;
@@ -21,6 +26,7 @@ import com.qait.tcautomation.ui.HomePageUi;
 import com.qait.tcautomation.ui.LoginPageUi;
 import com.qait.tcautomation.ui.StudentLearningObjectivesUi;
 import com.qait.tcautomation.util.PropertyReaderUtil;
+import com.qait.tcautomation.util.TcAutomationUtil;
 import com.qait.tcautomation.util.WaitUtil;
 
 public class BasePage {
@@ -215,7 +221,7 @@ public class BasePage {
 				+ "' to laod");
 		boolean isPageloaded = WaitUtil.waitForPageTitle(driver,
 				WaitUtil.DEFAULT_WAIT_FOR_PAGE, pageTitle);
-		Assert.assertTrue(isPageloaded, "Page with title " + pageTitle
+		assertTrue(isPageloaded, "Page with title " + pageTitle
 				+ " was not loaded..");
 	}
 
@@ -238,4 +244,13 @@ public class BasePage {
 		Reporter.log("Closed Browser session...");
 		return true;
 	}
+	
+	/**
+	 * Method will call sign out url and waits for login page to load
+	 */
+	public void signOut() {
+		driver.get(getPropertyValue("sign.out.url"));
+		waitForPageLoad(getPropertyValue("login.title"));
+	}
+	
 }
