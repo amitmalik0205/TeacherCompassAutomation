@@ -145,8 +145,7 @@ public class WaitUtil {
 				.implicitlyWait(DEFAULT_WAIT_FOR_ELEMENT, TimeUnit.SECONDS);
 		return webElementList;
 	}
-	
-	
+
 	/**
 	 * Method to wait for a page to load having title @param pageTitle
 	 * 
@@ -198,14 +197,13 @@ public class WaitUtil {
 		driver.manage().timeouts()
 				.implicitlyWait(timeInSeconds, TimeUnit.SECONDS);
 	}
-	
-	
+
 	public static boolean waitForJavaScriptCondition(WebDriver driver,
-			final String javaScript, int timeOutInSeconds, final Object...arg) {
+			final String javaScript, int timeOutInSeconds, final Object... arg) {
 		boolean jscondition = false;
 		try {
-			driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS); // nullify
-																			// implicitlyWait()
+			driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS); 
+																			
 			new WebDriverWait(driver, timeOutInSeconds) {
 			}.until(new ExpectedCondition<Boolean>() {
 
@@ -217,13 +215,27 @@ public class WaitUtil {
 			});
 			jscondition = (Boolean) ((JavascriptExecutor) driver)
 					.executeScript(javaScript);
-			driver.manage().timeouts()
-					.implicitlyWait(10, TimeUnit.SECONDS); // reset
-																			// implicitlyWait
+			driver.manage().timeouts().implicitlyWait(DEFAULT_WAIT_FOR_ELEMENT, TimeUnit.SECONDS); 
+																				
 			return jscondition;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return false;
+	}
+	
+	// Try not to use this method. Bad practice
+	/**
+	 * Hard wait for @param timeInSec seconds.
+	 * 
+	 * @param timeInSec
+	 *            time duration to wait for
+	 */
+	public static void explicitWait(int timeInSec) {
+		try {
+			Thread.sleep(timeInSec * 1000);
+		} catch (InterruptedException e) {
+			throw new AssertionError("Interrupted Exception");
+		}
 	}
 }

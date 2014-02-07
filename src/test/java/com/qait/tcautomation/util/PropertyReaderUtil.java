@@ -19,7 +19,7 @@ public class PropertyReaderUtil {
 	 * overridden and value from the last one will be stores.
 	 */
 	
-	// To-do : Need to store the pathsin a file rather than hard coding it in code
+	// To-do : Need to store the paths in a file rather than hard coding it in code
 	public void loadPropertyFiles() {
 		String filePathArray[] = { "/loginPage.properties",
 				"/homePage.properties",

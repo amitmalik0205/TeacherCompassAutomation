@@ -3,6 +3,7 @@ package com.qait.tcautomation.pages;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertThat;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
 import java.util.LinkedList;
@@ -12,9 +13,11 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.HttpCommandExecutor;
+import org.testng.Reporter;
 
 import com.qait.tcautomation.enums.UserType;
 import com.qait.tcautomation.util.PropertyReaderUtil;
+import com.qait.tcautomation.util.TcAutomationUtil;
 
 public class ClassRoomObservationFormPage extends BasePage {
 
@@ -95,7 +98,7 @@ public class ClassRoomObservationFormPage extends BasePage {
 				"Assertion Error : Comments for all objectives are not posted...",
 				reflectedScore, containsString("completed"));
 
-		System.out.println("Comments updated using save button for domain :"
+		Reporter.log("Comments updated using save button for domain :"
 				+ domainName);
 	}
 
@@ -163,16 +166,10 @@ public class ClassRoomObservationFormPage extends BasePage {
 	 */
 	private String clickDomainAnchorsByPosition(int pos) {
 
-		System.out.println("Inside clickDomainAnchorsByPosition( )...");
-
 		WebElement domainAnchorElement = classRoomObservationFormPageUi
 				.getDomainAnchorByPositionFromLeftPanel(pos);
 
 		domainAnchorElement.click();
-
-		// String domainAnchorElementText = driver.findElement(
-		// By.xpath("//div[@id='leftpanelnew']/ul/li[" + pos + "]/a/p"))
-		// .getText();
 
 		String domainAnchorElementText = classRoomObservationFormPageUi
 				.getDomainAnchorTextByPositionFromLeftPanel(pos).getText();
@@ -202,7 +199,7 @@ public class ClassRoomObservationFormPage extends BasePage {
 			element.sendKeys(comments);
 		}
 
-		System.out.println("Comments are posted...");
+		Reporter.log("Comments are posted successfully");
 	}
 
 	/**
@@ -215,7 +212,7 @@ public class ClassRoomObservationFormPage extends BasePage {
 
 		element.sendKeys(comments);
 
-		System.out.println("Overall Comments are posted...");
+		Reporter.log("Overall Comments are posted successfully");
 	}
 
 	/**
@@ -240,7 +237,7 @@ public class ClassRoomObservationFormPage extends BasePage {
 
 		waitForParagraphMessageToFadeOut();
 
-		System.out.println("Note pad comments posted...");
+		Reporter.log("Note pad comments posted");
 	}
 
 	/**
@@ -324,26 +321,27 @@ public class ClassRoomObservationFormPage extends BasePage {
 			}
 		}
 
-		System.out
-				.println("Notepad comments are reflected in the comment text areas..");
+		Reporter.log("Notepad comments are reflected in the comment text areas..");
 	}
 
 	// To-do : Flash automation..need to wrk on this
-	public void addArtifacts() {
+/*	public void addArtifacts() {
 		classRoomObservationFormPageUi.getArtifactButton().click();
 		classRoomObservationFormPageUi.getChooseFileTypeButton().click();
 		classRoomObservationFormPageUi.clickDocumentArtifactTypeButton();
 		System.out.println();
-	}
+	}*/
 
 	/**
 	 * Method to share the draft.
 	 */
 	public void shareDraftToPrincipal() {
 
-		System.out.println("Sharing draft to principal....");
+		Reporter.log("Sharing draft with principal");
 
 		classRoomObservationFormPageUi.getShareDraftButton().click();
+		
+		classRoomObservationFormPageUi.waitForSendDraftFormToVisible();
 
 		WebElement userEmailTextBox = classRoomObservationFormPageUi
 				.getShareDraftEmailTxtBox();
@@ -360,7 +358,7 @@ public class ClassRoomObservationFormPage extends BasePage {
 		// Wait for div containing message 'Draft sent successfully' to appear
 		waitForDivMessageToFadeOut();
 
-		System.out.println("Draft sent successfully");
+		Reporter.log("Draft sent successfully with principal");
 	}
 
 	/**
@@ -370,8 +368,6 @@ public class ClassRoomObservationFormPage extends BasePage {
 	 */
 	private void waitForDivMessageToFadeOut() {
 
-		System.out.println("Inside waitForDivMessageToFadeOut()..");
-
 		WebElement e = classRoomObservationFormPageUi
 				.waitForDivMessageToAppear();
 
@@ -379,5 +375,101 @@ public class ClassRoomObservationFormPage extends BasePage {
 			System.out
 					.println("inside while..Waiting for message in <div> to fade out");
 		}
+	}
+	
+	/**
+	 * Method to share draft back to teacher by principal
+	 */
+	public void shareDraftToTeacher() {
+		
+		classRoomObservationFormPageUi.getPrincipalShareButton().click();
+		
+		classRoomObservationFormPageUi.getFinalPrincipalShareButton().click();
+		// waitForPopUpToInvisible();
+		Reporter.log("Draft shared with teacher successfully");
+	}
+
+	/**
+	 * Wait for pop up (which contains the 'share' and 'cancel' buttons for
+	 * principal to share draft with teacher) to become invisible
+	 */
+	private void waitForPopUpToInvisible() {
+		WebElement e = classRoomObservationFormPageUi
+				.getPrincipalShareDraftModalDiv();
+		
+		while (e.isDisplayed()) {
+			System.out
+					.println("inside while..Waiting for principal share draft pop up to be invisible..");
+		}
+	}
+	
+	/**
+	 * Method will check whether principal feedback is reflected to teacher or
+	 * not for all domains. Method will click on all domain <a> links and check
+	 * the feedback for each objective
+	 */
+	public void checkForPrincipalFeedBack() {
+		
+		List<Integer> list = prepareDomainPositionListForObservation();
+
+		for (int i : list) {
+			String domainAnchorElementText = clickDomainAnchorsByPosition(i);
+
+			List<WebElement> eltList = classRoomObservationFormPageUi
+					.getPrincipalFeedBackDivList();
+			
+			for (WebElement e : eltList) {
+				System.out.println(e.getText());
+				assertEquals(
+						e.getText(),
+						getPropertyValue("observation.form.page.principal.direct.feedback.comment"),
+						"Principal feedback is not Refleced to the teacher for domain "
+								+ domainAnchorElementText);
+			}
+			
+		}
+		
+		Reporter.log("Principal Feedback is reflected successfully");
+	}
+	
+	/**
+	 * Method to approve SLO.
+	 */
+	public void approveSlo() {
+
+		classRoomObservationFormPageUi.getApproveEvaluationButton().click();
+
+		classRoomObservationFormPageUi.waitForApproveSloModalToVisible();
+
+		classRoomObservationFormPageUi.getFinalApproveEvaluationButton()
+				.click();
+		waitForDivMessageToFadeOut();
+		
+		Reporter.log("SLO is approved by the principal");
+	}
+	
+	/**
+	 * Method to score SLO. It will score every domain.
+	 */
+	public void scoreSlo() {
+
+		List<Integer> list = prepareDomainPositionListForObservation();
+
+		// click domains one by one
+		for (int i : list) {
+
+			clickDomainAnchorsByPosition(i);
+
+			WebElement e = classRoomObservationFormPageUi
+					.getScoreColumnForSlo(TcAutomationUtil
+							.getIntFormString(getPropertyValue("slo.score.column.after.approval")));
+			e.click();
+
+			classRoomObservationFormPageUi.clickSaveButton();
+
+			waitForDivMessageToFadeOut();
+		}
+
+		Reporter.log("Slo scored successfully by the principal");
 	}
 }

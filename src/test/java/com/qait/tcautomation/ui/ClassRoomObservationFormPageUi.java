@@ -20,7 +20,7 @@ public class ClassRoomObservationFormPageUi extends BaseUi {
 	 * List will contain all the <li> elements which are in the left pane i.e
 	 * Note pad link, Artifacts link, all domains.
 	 */
-	@FindBy(xpath = "//div[@id='leftpanelnew']/ul/li")
+	@FindBy(css = "div[id='leftpanelnew']>ul>li")
 	private List<WebElement> liElementList;
 
 	// text area for overall comments
@@ -67,6 +67,30 @@ public class ClassRoomObservationFormPageUi extends BaseUi {
 	@FindBy(id = "sendResponseInModal")
 	private WebElement finalPrincipalShareButton;
 
+	/**
+	 * This <div> contains the pop up containing final send and cancel buttons
+	 */
+	@FindBy(id = "confirm-send-response-modal")
+	private WebElement principalShareDraftModalDiv;
+
+	/**
+	 * List if <div> which contains the feedback of principal when draft is
+	 * shared by the principal to the teacher. Principal feedback will be
+	 * visible in these <div> to teacher
+	 */
+	@FindBy(css = "td.indicator>div:nth-of-type(2)>div.well>div:nth-of-type(2)")
+	private List<WebElement> principalFeedBackDivList;
+
+	@FindBy(id = "approveEvaluation")
+	private WebElement approveEvaluationButton;
+	
+	/**
+	 * 'Approve' button on modal pop up(Appears after clicking
+	 * approveEvaluationButton)
+	 */
+	@FindBy(id = "approveSloEvaluation")
+	private WebElement finalApproveEvaluationButton;
+	
 	public ClassRoomObservationFormPageUi(WebDriver driver) {
 		super(driver);
 	}
@@ -115,6 +139,22 @@ public class ClassRoomObservationFormPageUi extends BaseUi {
 		return finalPrincipalShareButton;
 	}
 
+	public WebElement getPrincipalShareDraftModalDiv() {
+		return principalShareDraftModalDiv;
+	}
+
+	public List<WebElement> getPrincipalFeedBackDivList() {
+		return principalFeedBackDivList;
+	}
+	
+	public WebElement getApproveEvaluationButton() {
+		return approveEvaluationButton;
+	}
+
+	public WebElement getFinalApproveEvaluationButton() {
+		return finalApproveEvaluationButton;
+	}
+
 	/**
 	 * Method returns the <a> element of Domains from left panel
 	 * 
@@ -123,8 +163,10 @@ public class ClassRoomObservationFormPageUi extends BaseUi {
 	 * @return
 	 */
 	public WebElement getDomainAnchorByPositionFromLeftPanel(int pos) {
-		return driver.findElement(By.xpath("//div[@id='leftpanelnew']/ul/li["
-				+ pos + "]/a"));
+		return driver.findElement(By
+				.cssSelector("div[id='leftpanelnew']>ul>li:nth-of-type(" + pos
+						+ ")>a"));
+
 	}
 
 	/**
@@ -136,8 +178,9 @@ public class ClassRoomObservationFormPageUi extends BaseUi {
 	 * @return
 	 */
 	public WebElement getDomainAnchorTextByPositionFromLeftPanel(int pos) {
-		return driver.findElement(By.xpath("//div[@id='leftpanelnew']/ul/li["
-				+ pos + "]/a/p"));
+		return driver.findElement(By
+				.cssSelector("div[id='leftpanelnew']>ul>li:nth-of-type(" + pos
+						+ ")>a>p"));
 	}
 
 	/**
@@ -154,7 +197,7 @@ public class ClassRoomObservationFormPageUi extends BaseUi {
 		List<WebElement> listOfCommentTextArea = WaitUtil
 				.waitForAllElementsPresence(
 						driver,
-						By.xpath("//textarea[@placeholder='" + placeHolder
+						By.cssSelector("textarea[placeholder='" + placeHolder
 								+ "']"), WaitUtil.DEFAULT_WAIT_FOR_ELEMENT);
 
 		return listOfCommentTextArea;
@@ -169,8 +212,9 @@ public class ClassRoomObservationFormPageUi extends BaseUi {
 	 * @return
 	 */
 	public WebElement getStatusElemtFromLeftPanel(int pos) {
-		return driver.findElement(By.xpath("//div[@id='leftpanelnew']/ul/li["
-				+ pos + "]/a/div"));
+		return driver.findElement(By
+				.cssSelector("div[id='leftpanelnew']>ul>li:nth-of-type(" + pos
+						+ ")>a>div"));
 	}
 
 	/**
@@ -205,7 +249,7 @@ public class ClassRoomObservationFormPageUi extends BaseUi {
 		List<WebElement> popUpTable = WaitUtil
 				.waitForAllElementsPresence(
 						driver,
-						By.xpath("//div[@id='viewShareData']/div[2]/div/div/table/tbody/tr/td[2]/input"),
+						By.cssSelector("div[id='viewShareData']>div:nth-of-type(2)>div>div>table>tbody>tr>td:nth-of-type(2)>input"),
 						WaitUtil.DEFAULT_WAIT_FOR_ELEMENT);
 
 		return popUpTable;
@@ -216,10 +260,11 @@ public class ClassRoomObservationFormPageUi extends BaseUi {
 	 * 'link to standards' button)
 	 */
 	public void clickSaveButtonOfPopUp() {
-
-		WebElement element = WaitUtil.waitForElementPresence(driver,
-				By.xpath("//div[@id='viewShareData']/div[3]/a[1]"),
-				WaitUtil.DEFAULT_WAIT_FOR_ELEMENT);
+		WebElement element = WaitUtil
+				.waitForElementPresence(
+						driver,
+						By.cssSelector("div[id='viewShareData']>div:nth-of-type(3)>a:nth-of-type(1)"),
+						WaitUtil.DEFAULT_WAIT_FOR_ELEMENT);
 
 		element.click();
 	}
@@ -231,30 +276,66 @@ public class ClassRoomObservationFormPageUi extends BaseUi {
 	 * and returns it
 	 */
 	public WebElement waitForParagraphMessageToAppear() {
-		WebElement e = WaitUtil
-				.waitForElementVisiblity(
-						driver,
-						By.xpath("//p[contains(@class, 'alert') and contains(@class, 'alert-success')]"),
-						WaitUtil.DEFAULT_WAIT_FOR_PAGE);
+		WebElement e = WaitUtil.waitForElementVisiblity(driver,
+				By.cssSelector("p[class='alert alert-success']"),
+				WaitUtil.DEFAULT_WAIT_FOR_PAGE);
 
 		return e;
 	}
 
 	/**
 	 * This method will wait until message 'Draft sent successfully' or 'Your
-	 * changes have been saved successfully' is shown in <div> and returns it
+	 * changes have been saved successfully' or 'You can now score this
+	 * evaluation. ' is shown in <div> and returns it
 	 */
 	public WebElement waitForDivMessageToAppear() {
-		WebElement e = WaitUtil
-				.waitForElementVisiblity(
-						driver,
-						By.xpath("//div[contains(@class, 'alert') and contains(@class, 'alert-success')]"),
-						WaitUtil.DEFAULT_WAIT_FOR_ELEMENT);
+
+		WebElement e = WaitUtil.waitForElementVisiblity(driver,
+				By.cssSelector("div[class='alert alert-success']"),
+				WaitUtil.DEFAULT_WAIT_FOR_ELEMENT);
 
 		return e;
 	}
 
-	public void clickDocumentArtifactTypeButton() {
+	/**
+	 * Method waits until form in Modal pop up for sending draft becomes visible
+	 */
+	public void waitForSendDraftFormToVisible() {
+
+		WaitUtil.waitForElementPresence(driver, By.id("senddraftform"),
+				WaitUtil.DEFAULT_WAIT_FOR_ELEMENT);
+
+		WaitUtil.waitForElementPresence(driver, By.id("associatedUser"),
+				WaitUtil.DEFAULT_WAIT_FOR_ELEMENT);
+	}
+	
+	/**
+	 * Method waits until Modal pop up for approve SLO becomes visible
+	 */
+	public void waitForApproveSloModalToVisible() {
+
+		WaitUtil.waitForElementVisiblity(driver, By.id("confirm-approveslo-modal"),
+				WaitUtil.DEFAULT_WAIT_FOR_ELEMENT);
+
+	}
+	
+	
+	/**
+	 * This method will return the column corresponding to @param colNum from
+	 * the score table. This score is given after slo is approved.
+	 * 
+	 * @param colNum
+	 *            column number in score row.
+	 * @return WebElement
+	 */
+	public WebElement getScoreColumnForSlo(int colNum) {
+		return driver
+				.findElement(By
+						.cssSelector("table.scoringLevelItems>tbody>tr:nth-child(1)>td:nth-child("
+								+ colNum + ")>div:nth-of-type(2)"));
+	}
+	
+/*	public void clickDocumentArtifactTypeButton() {
 		// ((JavascriptExecutor) driver).executeScript("checkFileType(11);");
 		driver.findElement(
 				By.cssSelector("ul[class='dropdown-menu']>li:nth-child(1)>a"))
@@ -273,10 +354,10 @@ public class ClassRoomObservationFormPageUi extends BaseUi {
 		((JavascriptExecutor) driver)
 				.executeScript("var o = swfobject.getObjectById('kaltura-uploader'); alert(o);");
 		System.out.println();
-		/*
+		
 		 * WaitUtil.waitForElementPresence(driver,
 		 * By.cssSelector("div[id='kaltura-upload-form'] [class='']"),
 		 * WaitUtil.DEFAULT_WAIT_FOR_ELEMENT); System.out.println();
-		 */
-	}
+		 
+	}*/
 }

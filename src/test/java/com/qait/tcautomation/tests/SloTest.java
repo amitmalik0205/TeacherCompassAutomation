@@ -1,6 +1,7 @@
 package com.qait.tcautomation.tests;
 
 import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -30,21 +31,21 @@ public class SloTest extends BaseTest {
 
 	/**
 	 * This test does the following things: 1. Log in as a teacher. 2. Launch
-	 * new SLO 3. Post comments directly and check the status in left
-	 * pane('completed') 4. Post comments through note pad by selecting
-	 * objectives from pop up 5. check whether note pad comments are reflected
-	 * in text areas or not. 6. Share draft to principal
+	 * new SLO by selection the window 3. Post comments directly and check the
+	 * status in left pane('completed') 4. Post comments through note pad by
+	 * selecting objectives from pop up 5. check whether note pad comments are
+	 * reflected in text areas or not. 6. Share draft to principal
 	 */
 	@Test
 	public void sloTeacherShareDraftTest() {
+
 		homePage = loginPage.login(UserType.TEACHER);
 		assertNotNull(homePage);
 
 		sloPage = homePage.getSloPage();
+		sloPage.loadSloWindow();
 		classRoomObservationFormPage = sloPage
 				.loadClassroomObservationFormPage();
-
-		System.out.println("SLO page launched succesfully...");
 
 		postComments();
 
@@ -55,6 +56,88 @@ public class SloTest extends BaseTest {
 		classRoomObservationFormPage.shareDraftToPrincipal();
 
 		homePage.signOut();
+	}
+	
+	
+	/**
+	 * This test does the following things: 1.Login as Principal 2.Click on the
+	 * first notification in the notification bubble. 3.post feedback 4.Share
+	 * again it with teacher and sign out
+	 */
+	@Test(dependsOnMethods = { "sloTeacherShareDraftTest" })
+	public void sloPrincipalShareDraftTest() {
+
+		homePage = loginPage.login(UserType.PRINCIPAL);
+
+		classRoomObservationFormPage = homePage.viewNotificationByIndex(0);
+
+		classRoomObservationFormPage.postCommentsForSlo(UserType.PRINCIPAL);
+
+		classRoomObservationFormPage.shareDraftToTeacher();
+
+		homePage.signOut();
+	}
+
+	
+	/**
+	 * This test does the following things: 1.Login as Teacher 2.open the slo
+	 * list for window by selecting it from drop down list 3.Check for the
+	 * status of slo 4.Edit the slo 5.Check whether principal feedback is
+	 * reflect 6.Share it again with Principal and sign out
+	 */
+	@Test(dependsOnMethods = { "sloPrincipalShareDraftTest" })
+	public void sloTeacherShareDraftAgainTest() {
+
+		homePage = loginPage.login(UserType.TEACHER);
+		sloPage = homePage.getSloPage();
+		sloPage.loadSloWindow();
+
+		/*
+		 * Now check whether slo status is
+		 * 'slo.status.after.principal.share.draft' property value. After
+		 * principal shares draft its status changes to
+		 * 'slo.status.after.principal.share.draft' property
+		 */
+		boolean b = sloPage.isSloInProgress(1);
+		assertTrue(b, "SLO status is not correctly reflected..");
+
+		// Now edit the SLO
+		classRoomObservationFormPage = sloPage.editSloFormGrid(1);
+
+		// Check whether principal feedback is reflected to teacher or not
+		classRoomObservationFormPage.checkForPrincipalFeedBack();
+
+		classRoomObservationFormPage.shareDraftToPrincipal();
+
+		homePage.signOut();
+	}
+	
+	
+	/**
+	 * This test does the following things: 1.Login as Teacher 2.open the slo
+	 * list for window by selecting it from drop down list 3.Check for the
+	 * status of slo 4.Edit the slo from grid 6.Approve slo and score it
+	 */
+	@Test(dependsOnMethods = { "sloTeacherShareDraftAgainTest" })
+	public void sloPrincipalScoreTest() {
+		homePage = loginPage.login(UserType.PRINCIPAL);
+		sloPage = homePage.getSloPage();
+		sloPage.loadSloWindow();
+
+		/*
+		 * Now check whether slo status is 'slo.progress.status' property value.
+		 * After principal shares draft its status changes to
+		 * 'slo.progress.status' property
+		 */
+		boolean b = sloPage.isSloInDraft(1);
+		assertTrue(b, "SLO status is not correctly reflected..");
+
+		// Edit the SLO
+		classRoomObservationFormPage = sloPage.editSloFormGrid(1);
+		// Approve SLO
+		classRoomObservationFormPage.approveSlo();
+		// Score SLO
+		classRoomObservationFormPage.scoreSlo();
 	}
 
 	/**

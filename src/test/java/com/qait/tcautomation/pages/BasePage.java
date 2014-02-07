@@ -253,4 +253,61 @@ public class BasePage {
 		waitForPageLoad(getPropertyValue("login.title"));
 	}
 	
+	
+	
+	/**
+	 * Method will check if there are notifications and click the anchor link as
+	 * specified by @param index
+	 * 
+	 * @param index index of list
+	 * 
+	 * @return ClassRoomObservationFormPage
+	 */
+	public ClassRoomObservationFormPage viewNotificationByIndex(int index) {
+		if(areNewNotifactionPresent()) {
+			
+			clickNotificationBubble();
+
+			List<WebElement> notificationAnchorList = homePageUi
+					.getNotificationAnchorList();
+
+			WebElement e = notificationAnchorList.get(index);
+
+			assertNotNull(e,
+					"'View it now' anchor not found in notification list..");
+			e.click();
+
+			waitForPageLoad(getPropertyValue("observation.form.page.title1"));
+
+			Reporter.log("Notifaction found");
+			
+			return new ClassRoomObservationFormPage(driver, capabilities,
+					executor, propertReaderUtil);
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Method will get the text of notification bubble
+	 * 
+	 * @return true if bubble text is > 0 otherwise false
+	 */
+	public boolean areNewNotifactionPresent() {
+		return TcAutomationUtil.getIntFormString(homePageUi
+				.getNotificationBubbleDivSpan().getText()) > 0;
+	}
+	
+	/**
+	 * Method will click on the notification bubble and wait for the
+	 * notification list to appear.
+	 */
+	public void clickNotificationBubble() {
+
+		homePageUi.getNotificationBubbleDiv().click();
+
+		WaitUtil.waitForElementVisiblity(driver,
+				By.cssSelector("div[id='mainBackgroundAlertsBubble_callout']"),
+				WaitUtil.DEFAULT_WAIT_FOR_ELEMENT);
+	}
 }

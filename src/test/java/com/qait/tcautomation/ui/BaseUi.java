@@ -11,21 +11,21 @@ import org.openqa.selenium.support.PageFactory;
 public class BaseUi {
 
 	WebDriver driver;
-	
+
 	/**
 	 * Notification alert bubble
 	 */
 	@FindBy(id = "mainBackgroundAlertsBubble")
 	private WebElement notificationBubbleDiv;
-	
+
 	/**
 	 * Span in the Notification alert bubble which shows no of notifications
 	 */
 	@FindBy(css = "div[id='mainBackgroundAlertsBubble']>span")
 	private WebElement notificationBubbleDivSpan;
-	
+
 	/**
-	 * List of  <a> tags in notification drop down list
+	 * List of <a> tags in notification drop down list
 	 */
 	@FindBy(css = "div[id='body']>ul>li>div:nth-child(2)>a")
 	private List<WebElement> notificationAnchorList;
@@ -42,8 +42,7 @@ public class BaseUi {
 	 *            label of the Anchor
 	 */
 	public void clickAnchorWithLinkText(String linkText) {
-		WebElement link = driver.findElement(By.xpath("(//a[contains(text(),'"
-				+ linkText + "')])"));
+		WebElement link = driver.findElement(By.linkText(linkText));
 		link.click();
 	}
 
